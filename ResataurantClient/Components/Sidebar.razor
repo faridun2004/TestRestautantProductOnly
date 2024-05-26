@@ -1,0 +1,44 @@
+﻿@* @code {
+    // JavaScript Interop to call JavaScript functions from Blazor
+    private async Task OpenNav()
+    {
+        await JS.InvokeVoidAsync("openNav");
+    }
+
+    private async Task CloseNav()
+    {
+        await JS.InvokeVoidAsync("closeNav");
+    }
+}
+
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" @onclick="CloseNav">&times;</a>
+    <a href="#">О нас</a>
+    <a href="#">Услуги</a>
+    <a href="#">Контакты</a>
+</div>
+
+<button class="openbtn" @onclick="OpenNav">☰ Открыть меню</button>
+
+@inject IJSRuntime JS
+ *@
+<div class="side-panel @(isOpen ? "open" : "")">
+    <h2>Меню</h2>
+    <ul>
+        <li>Блюдо 1</li>
+        <li>Блюдо 2</li>
+        <li>Блюдо 3</li>
+    </ul>
+    <button class="btn btn-light mt-3" @onclick="TogglePanel">Закрыть</button>
+</div>
+
+@code {
+    [Parameter] public bool isOpen { get; set; }
+    [Parameter] public EventCallback<bool> isOpenChanged { get; set; }
+
+    private void TogglePanel()
+    {
+        isOpen = !isOpen;
+        isOpenChanged.InvokeAsync(isOpen);
+    }
+}

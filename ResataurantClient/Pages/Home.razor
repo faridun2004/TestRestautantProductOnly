@@ -1,0 +1,29 @@
+﻿@page "/"
+@using ResataurantClient.Components
+@using ResataurantClient.Models
+
+<div class="container mt-5">
+    <div class="jumbotron">
+        <h1 class="display-4">Добро пожаловать в наш ресторан!</h1>
+        <p class="lead">Наслаждайтесь лучшими блюдами и уютной атмосферой.</p>
+        <hr class="my-4">
+        <p>Посетите наше меню и узнайте о наших специальных предложениях.</p>
+        <a class="btn btn-primary btn-lg" href="#menu" role="button">Посмотреть меню</a>
+    </div>
+</div>
+<Menu />
+<div class="container" id="menu">
+    <h2>Наше меню</h2>
+    <div class="row">
+        <!-- Ваше меню -->
+    </div>
+</div>
+
+@code {
+    private bool isPanelOpen = false;
+
+    private void TogglePanel()
+    {
+        isPanelOpen = !isPanelOpen;
+    }
+}

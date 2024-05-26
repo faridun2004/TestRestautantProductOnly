@@ -1,0 +1,91 @@
+﻿@page "/cart"
+@using ResataurantClient.Models
+@using ResataurantClient.Services
+@inject ICartService CartService
+@inject NavigationManager NavigationManager
+@inject IOrderService OrderService
+
+<h2>Корзина</h2>
+
+@if (cart == null || !cart.Items.Any())
+{
+    <p>Ваша корзина пуста.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Количество</th>
+                <th>Цена</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in cart.Items)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>
+                        <button class="btn btn-secondary" @onclick="() => UpdateQuantity(item.ProductId, item.Quantity - 1)">-</button>
+                        @item.Quantity
+                        <button class="btn btn-secondary" @onclick="() => UpdateQuantity(item.ProductId, item.Quantity + 1)">+</button>
+                    </td>
+                    <td>@item.Price Сомони</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => RemoveFromCart(item.ProductId)">Удалить</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <h4>Итоговая сумма: @cart.TotalPrice Сомони</h4>
+    <button class="btn btn-primary" @onclick="ClearCart">Очистить корзину</button>
+    <button class="btn btn-primary" @onclick="CreateOrder">Оформить заказ</button>
+}
+
+@code {
+    private ResataurantClient.Models.Cart? cart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cart = await CartService.GetCart();
+    }
+
+    private async Task RemoveFromCart(int productId)
+    {
+        await CartService.RemoveFromCart(productId);
+        cart = await CartService.GetCart();
+    }
+
+    private async Task ClearCart()
+    {
+        await CartService.ClearCart();
+        cart = await CartService.GetCart();
+    }
+
+    private async Task UpdateQuantity(int productId, int newQuantity)
+    {
+        if (newQuantity > 0)
+        {
+            await CartService.UpdateQuantity(productId, newQuantity);
+        }
+        else
+        {
+            await CartService.RemoveFromCart(productId);
+        }
+        cart = await CartService.GetCart();
+    }
+
+    private async Task CreateOrder()
+    {
+        var orderId = await OrderService.CreateOrder();
+        NavigationManager.NavigateTo($"/order/{orderId}");
+    }
+
+    private void GoToCheckout()
+    {
+        NavigationManager.NavigateTo("/checkout");
+    }
+}

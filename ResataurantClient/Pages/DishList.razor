@@ -1,0 +1,60 @@
+﻿@page "/products"
+@using ResataurantClient.Models
+@using RestaurantClient.Services
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+
+<h3 class="my-4">Dishes</h3>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        @foreach (var product in products)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="http://localhost:5298/@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 220px; object-fit: cover;" onerror="this.onerror=null;">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">@product.Description</p>
+                        <p class="card-text"><strong>Price:</strong> @product.Price Сомонӣ</p>
+                    </div>
+                    <div class="card-footer">
+                        <button @onclick="() => EditProduct(product.Id)" class="btn btn-primary btn-sm">Edit</button>
+                        <button @onclick="() => DeleteProduct(product.Id)" class="btn btn-danger btn-sm">Delete</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <button @onclick="CreateProduct" class="btn btn-success mt-4">Create New Dish</button>
+}
+
+@code {
+    private IEnumerable<Product>? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetAllProducts();
+    }
+
+    private void CreateProduct()
+    {
+        NavigationManager.NavigateTo("/create-product");
+    }
+
+    private void EditProduct(int id)
+    {
+        NavigationManager.NavigateTo($"/edit-product/{id}");
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        await ProductService.DeleteProduct(id);
+        products = await ProductService.GetAllProducts();
+    }
+}

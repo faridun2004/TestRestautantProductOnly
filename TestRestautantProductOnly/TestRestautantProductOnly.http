@@ -1,0 +1,6 @@
+@TestRestautantProductOnly_HostAddress = http://localhost:5298
+
+GET {{TestRestautantProductOnly_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
