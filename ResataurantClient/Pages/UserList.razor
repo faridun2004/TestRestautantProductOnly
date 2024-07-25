@@ -1,0 +1,45 @@
+﻿@page "/users"
+@using ResataurantClient.Models
+@using ResataurantClient.Services
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+<h3 class="my-4">Users</h3>
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        @foreach (var product in users)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="http://localhost:3030/@product.Photo" class="card-img-top" alt="@product.Name" style="height: 220px; object-fit: cover;" onerror="this.onerror=null;">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                    </div>
+                    <div class="card-footer">
+                        <button @onclick="() => DeleteProduct(product.Id)" class="btn btn-danger btn-sm">Delete</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private IEnumerable<User>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetAllUsers();
+    }
+    private async Task DeleteProduct(int id)
+    {
+        await UserService.DeleteUser(id);
+        users = await UserService.GetAllUsers();
+    }
+}

@@ -106,42 +106,6 @@ namespace TestRestautantProductOnly.Controllers
             return $"/uploads/{fileName}";
         }
 
-        //private async Task<string> SaveImage(IFormFile imageFile)
-        //{
-        //    try
-        //    {
-        //        if (_environment.WebRootPath == null)
-        //        {
-        //            throw new InvalidOperationException("WebRootPath is not set.");
-        //        }
-
-        //        var uploads = Path.Combine(_environment.WebRootPath, "uploads");
-        //        _logger.LogInformation("Uploads path: {UploadsPath}", uploads);
-
-        //        if (!Directory.Exists(uploads))
-        //        {
-        //            Directory.CreateDirectory(uploads);
-        //            _logger.LogInformation("Created directory: {UploadsPath}", uploads);
-        //        }
-
-        //        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-        //        var filePath = Path.Combine(uploads, fileName);
-        //        _logger.LogInformation("File path: {FilePath}", filePath);
-
-        //        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        //        {
-        //            await imageFile.CopyToAsync(fileStream);
-        //        }
-
-        //        _logger.LogInformation("File saved successfully: {FilePath}", filePath);
-
-        //        return $"/uploads/{fileName}";
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "An error occurred while saving the image");
-        //        throw;
-        //    }
-        //}
+        
     }
 }

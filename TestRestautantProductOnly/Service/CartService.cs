@@ -4,53 +4,69 @@ namespace TestRestautantProductOnly.Service
 {
     public class CartService : ICartService
     {
-        private Cart _cart = new Cart();
+        private readonly Dictionary<int, Cart> _carts = new Dictionary<int, Cart>();
 
-        public Cart GetCart()
+        public bool UserExists(int userId)
         {
-            return _cart;
+            // Здесь можно добавить логику для проверки существования пользователя в базе данных
+            return true; // Пример для упрощения
         }
 
-        public void AddToCart(CartItem item)
+        public Cart GetCart(int userId)
         {
-            var existingItem = _cart.Items.FirstOrDefault(i => i.ProductId == item.ProductId);
+            if (!_carts.ContainsKey(userId))
+            {
+                _carts[userId] = new Cart { UserId = userId };
+            }
+            return _carts[userId];
+        }
+
+        public void AddToCart(int userId, CartItem item)
+        {
+            var cart = GetCart(userId);
+            var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == item.ProductId);
             if (existingItem != null)
             {
                 existingItem.Quantity += item.Quantity;
             }
             else
             {
-                _cart.Items.Add(item);
+                cart.Items.Add(item);
             }
         }
 
-        public void RemoveFromCart(int productId)
+        public void RemoveFromCart(int userId, int productId)
         {
-            var item = _cart.Items.FirstOrDefault(i => i.ProductId == productId);
+            var cart = GetCart(userId);
+            var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
             if (item != null)
             {
-                _cart.Items.Remove(item);
+                cart.Items.Remove(item);
             }
         }
 
-        public void ClearCart()
+        public void ClearCart(int userId)
         {
-            _cart.Items.Clear();
+            var cart = GetCart(userId);
+            cart.Items.Clear();
         }
-        public void UpdateQuantity(int productId, int newQuantity)
+
+        public void UpdateQuantity(int userId, int productId, int newQuantity)
         {
-            var item = _cart.Items.FirstOrDefault(i => i.ProductId == productId);
+            var cart = GetCart(userId);
+            var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
             if (item != null)
             {
                 if (newQuantity > 0)
                 {
                     item.Quantity = newQuantity;
                 }
-                else if (newQuantity < 0)
+                else
                 {
-                    _cart.Items.Remove(item);
+                    cart.Items.Remove(item);
                 }
             }
         }
     }
+
 }

@@ -1,49 +1,116 @@
-﻿@page "/order/{orderId:int}"
+﻿@page "/checkout"
 @using ResataurantClient.Models
 @using ResataurantClient.Services
+@inject ICartService CartService
 @inject IOrderService OrderService
 @inject NavigationManager NavigationManager
-@code {
-    [Parameter]
-    public int OrderId { get; set; }
-    private Order? order;
 
-    protected override async Task OnInitializedAsync()
-    {
-        order = await OrderService.GetOrder(OrderId);
-    }
-}
+<!-- Подключаем стили Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-<h2>Детали заказа</h2>
+<h2>Оформление заказа</h2>
 
-@if (order == null)
+@if (orderPlaced)
 {
-    <p>Загрузка...</p>
+    <!-- Всплывающее уведомление в стиле Toast -->
+    <div class="toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                @successMessage
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" aria-label="Закрыть" @onclick="() => orderPlaced = false"></button>
+        </div>
+    </div>
 }
 else
 {
-    <div>
-        <h4>Номер заказа: @order.OrderId</h4>
-        <h4>Дата заказа: @order.OrderDate</h4>
-        <h4>Итоговая сумма: @order.TotalPrice Сомони</h4>
+    <!-- Форма для оформления заказа -->
+    <form>
+        <label>Имя:</label>
+        <input type="text" @bind="customerName" />
+
+        <label>Адрес:</label>
+        <input type="text" @bind="customerAddress" />
+
+        <label>Email:</label>
+        <input type="email" @bind="customerEmail" />
+
         <table class="table">
             <thead>
                 <tr>
                     <th>Название</th>
                     <th>Количество</th>
                     <th>Цена</th>
+                    <th>Действие</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in order.OrderItems)
+                @foreach (var item in cart.Items)
                 {
                     <tr>
                         <td>@item.Name</td>
                         <td>@item.Quantity</td>
                         <td>@item.Price Сомони</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => RemoveFromCart(item.ProductId)">Удалить</button>
+                        </td>
                     </tr>
                 }
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2"></td>
+                    <td><strong>Общая стоимость:</strong></td>
+                    <td>@cart.TotalPrice Сомони</td>
+                </tr>
+            </tfoot>
         </table>
-    </div>
+
+        <button type="submit" @onclick="PlaceOrder">Оформить заказ</button>
+    </form>
+}
+
+@code {
+    private string customerName;
+    private string customerAddress;
+    private string customerEmail;
+    private bool orderPlaced;
+    private string successMessage;
+    private ResataurantClient.Models.Cart? cart;
+    private int userId = 1; // Пример. Установите правильное значение userId здесь
+
+    protected override async Task OnInitializedAsync()
+    {
+        cart = await CartService.GetCart(userId);
+    }
+
+    private async Task PlaceOrder()
+    {
+        var orderCreateDto = new OrderCreateDto
+            {
+                CustomerName = customerName,
+                CustomerAddress = customerAddress,
+                CustomerEmail = customerEmail,
+                // Добавьте информацию о товарах в заказ, если нужно
+            };
+
+        var result = await OrderService.PlaceOrder(orderCreateDto);
+
+        if (result)
+        {
+            orderPlaced = true;
+            successMessage = "Ваш заказ успешно оформлен!";
+            await CartService.ClearCart(userId); // Очистка корзины после успешного оформления заказа
+        }
+        else
+        {
+            successMessage = "Ошибка при оформлении заказа. Попробуйте снова.";
+        }
+    }
+
+    private async Task RemoveFromCart(int productId)
+    {
+        await CartService.RemoveFromCart(userId, productId);
+        cart = await CartService.GetCart(userId);
+    }
 }

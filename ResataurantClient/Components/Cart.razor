@@ -19,6 +19,7 @@ else
                 <th>Название</th>
                 <th>Количество</th>
                 <th>Цена</th>
+                <th>Фото</th>
                 <th>Действие</th>
             </tr>
         </thead>
@@ -34,6 +35,9 @@ else
                     </td>
                     <td>@item.Price Сомони</td>
                     <td>
+                        <img src="http://localhost:3030/@item.ImageUrl" class="card-img-top" alt="@item.Name" style="height: 20px;">
+                    </td>
+                    <td>
                         <button class="btn btn-danger" @onclick="() => RemoveFromCart(item.ProductId)">Удалить</button>
                     </td>
                 </tr>
@@ -42,46 +46,41 @@ else
     </table>
     <h4>Итоговая сумма: @cart.TotalPrice Сомони</h4>
     <button class="btn btn-primary" @onclick="ClearCart">Очистить корзину</button>
-    <button class="btn btn-primary" @onclick="CreateOrder">Оформить заказ</button>
+    <button class="btn btn-primary" @onclick="GoToCheckout">Оформить заказ</button>
 }
 
 @code {
     private ResataurantClient.Models.Cart? cart;
+    private int userId = 1; // Пример. Установите правильное значение userId здесь
 
     protected override async Task OnInitializedAsync()
     {
-        cart = await CartService.GetCart();
+        cart = await CartService.GetCart(userId);
     }
 
     private async Task RemoveFromCart(int productId)
     {
-        await CartService.RemoveFromCart(productId);
-        cart = await CartService.GetCart();
+        await CartService.RemoveFromCart(userId, productId);
+        cart = await CartService.GetCart(userId);
     }
 
     private async Task ClearCart()
     {
-        await CartService.ClearCart();
-        cart = await CartService.GetCart();
+        await CartService.ClearCart(userId);
+        cart = await CartService.GetCart(userId);
     }
 
     private async Task UpdateQuantity(int productId, int newQuantity)
     {
         if (newQuantity > 0)
         {
-            await CartService.UpdateQuantity(productId, newQuantity);
+            await CartService.UpdateQuantity(userId, productId, newQuantity);
         }
         else
         {
-            await CartService.RemoveFromCart(productId);
+            await CartService.RemoveFromCart(userId, productId);
         }
-        cart = await CartService.GetCart();
-    }
-
-    private async Task CreateOrder()
-    {
-        var orderId = await OrderService.CreateOrder();
-        NavigationManager.NavigateTo($"/order/{orderId}");
+        cart = await CartService.GetCart(userId);
     }
 
     private void GoToCheckout()

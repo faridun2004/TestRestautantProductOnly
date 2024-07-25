@@ -1,10 +1,10 @@
-﻿using TestRestautantProductOnly.Model;
+﻿using TestRestautantProductOnly.Model.Orders;
 
 namespace TestRestautantProductOnly.Repository
 {
     public interface IOrderRepository
     {
-        Task<Order> CreateOrderAsync(Order order);
-        Task<IEnumerable<Order>> GetAllOrdersAsync();
+        Task<Order> CreateOrderAsync(int userId,Order order);
+        Task<IEnumerable<Order>> GetAllOrdersAsync(int userId);
     }
 }

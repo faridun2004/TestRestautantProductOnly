@@ -1,12 +1,11 @@
-﻿using TestRestautantProductOnly.Model;
+﻿using TestRestautantProductOnly.Model.Orders;
 
 namespace TestRestautantProductOnly.Service
 {
     public interface IOrderService
     {
 
-        Task<int> CreateOrder(Order order);
-        Task<Order> GetOrder(int orderId);
-        Task<IEnumerable<Order>> GetOrders();
+        Task<Order> CreateOrderAsync(int userId,OrderCreateDto orderCreateDto);
+        Task<Order> GetOrderByIdAsync(int userId,int id);
     }
 }

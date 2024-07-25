@@ -1,29 +1,52 @@
 ﻿using ResataurantClient.Models;
 using System.Net.Http.Json;
 
-public class OrderService : IOrderService
+namespace ResataurantClient.Services
 {
-    private readonly HttpClient _httpClient;
-
-    public OrderService(HttpClient httpClient)
+    public class OrderService: IOrderService
     {
-        _httpClient = httpClient;
-    }
+        //private readonly HttpClient _httpClient;
 
-    public async Task<int> CreateOrder()
-    {
-        var response = await _httpClient.PostAsync("api/order", null);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<int>();
-    }
+        //public OrderService(HttpClient httpClient)
+        //{
+        //    _httpClient = httpClient;
+        //}
 
-    public async Task<Order> GetOrder(int orderId)
-    {
-        return await _httpClient.GetFromJsonAsync<Order>($"api/order/{orderId}");
-    }
+        //public async Task<Order> CreateOrderAsync(OrderCreateDto orderCreateDto)
+        //{
+        //    var response = await _httpClient.PostAsJsonAsync("api/orders", orderCreateDto);
+        //    response.EnsureSuccessStatusCode();
 
-    public async Task<IEnumerable<Order>> GetOrders()
-    {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<Order>>("api/order");
+        //    return await response.Content.ReadFromJsonAsync<Order>();
+        //}
+
+        //public async Task<Order> GetOrderByIdAsync(int id)
+        //{
+        //    var response = await _httpClient.GetAsync($"api/orders/{id}");
+        //    response.EnsureSuccessStatusCode();
+
+        //    return await response.Content.ReadFromJsonAsync<Order>();
+        //}
+        private readonly HttpClient _httpClient;
+
+        public OrderService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public async Task<bool> PlaceOrder(OrderCreateDto orderCreateDto)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync("api/orders", orderCreateDto);
+                response.EnsureSuccessStatusCode();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Обработка ошибок, например, логирование или возврат false
+                return false;
+            }
+        }
     }
 }

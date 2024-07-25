@@ -2,61 +2,39 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TestRestautantProductOnly.Model;
+using TestRestautantProductOnly.Model.Orders;
 using TestRestautantProductOnly.Service;
 
 namespace TestRestautantProductOnly.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        private readonly ICartService _cartService;
 
-        public OrderController(IOrderService orderService, ICartService cartService)
+        public OrdersController(IOrderService orderService)
         {
             _orderService = orderService;
-            _cartService = cartService;
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> CreateOrder()
+        public async Task<IActionResult> CreateOrder(int userId,[FromBody] OrderCreateDto orderCreateDto)
         {
-            var cart = _cartService.GetCart();
-            var order = new Order
-            {
-                OrderItems = cart.Items.Select(item => new OrderItem
-                {
-                    ProductId = item.ProductId,
-                    Name = item.Name,
-                    Quantity = item.Quantity,
-                    Price = item.Price
-                }).ToList(),
-                TotalPrice = cart.TotalPrice
-            };
-
-            var orderId = await _orderService.CreateOrder(order);
-            _cartService.ClearCart(); 
-            return Ok(orderId);
+            var order = await _orderService.CreateOrderAsync(userId,orderCreateDto);
+            return CreatedAtAction(nameof(GetOrder), new { id = order.Id, userId=order.UserId }, order);
         }
 
-        [HttpGet("{orderId}")]
-        public async Task<ActionResult<Order>> GetOrder(int orderId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrder(int userId, int id)
         {
-            var order = await _orderService.GetOrder(orderId);
+            var order = await _orderService.GetOrderByIdAsync(userId,id);
             if (order == null)
             {
                 return NotFound();
             }
             return Ok(order);
         }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
-        {
-            var orders = await _orderService.GetOrders();
-            return Ok(orders);
-        }
     }
+
 }

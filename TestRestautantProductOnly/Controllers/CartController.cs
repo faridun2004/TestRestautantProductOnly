@@ -15,50 +15,59 @@ namespace TestRestautantProductOnly.Controllers
             _cartService = cartService;
         }
 
-        [HttpGet]
-        public ActionResult<Cart> GetCart()
+        [HttpGet("{userId}")]
+        public ActionResult<Cart> GetCart(int userId)
         {
-            return Ok(_cartService.GetCart());
-        }
-
-        [HttpPost]
-        public ActionResult AddToCart([FromBody] CartItem item)
-        {
-            _cartService.AddToCart(item);
-            return Ok();
-        }
-
-        [HttpDelete("{productId}")]
-        public ActionResult RemoveFromCart(int productId)
-        {
-            _cartService.RemoveFromCart(productId);
-            return Ok();
-        }
-
-        [HttpDelete]
-        public ActionResult ClearCart()
-        {
-            _cartService.ClearCart();
-            return Ok();
-        }
-        [HttpPut("update-quantity")]
-        public IActionResult UpdateQuantity([FromBody] UpdateQuantityRequest request)
-        {
-            var cart = _cartService.GetCart();
-            var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
-            if (item != null)
-            {
-                if (request.NewQuantity > 0)
-                {
-                    item.Quantity = request.NewQuantity;
-                }
-                else
-                {
-                    cart.Items.Remove(item);
-                }
-                return Ok(cart);
+            if (!_cartService.UserExists(userId))
+            {   
+                return NotFound("User not found.");
             }
-            return NotFound();
+            return Ok(_cartService.GetCart(userId));
+        }
+
+        [HttpPost("{userId}")]
+        public ActionResult AddToCart(int userId, [FromBody] CartItem item)
+        {
+            if (!_cartService.UserExists(userId))
+            {
+                return NotFound("User not found.");
+            }
+            _cartService.AddToCart(userId, item);
+            return Ok();
+        }
+
+        [HttpDelete("{userId}/{productId}")]
+        public ActionResult RemoveFromCart(int userId, int productId)
+        {
+            if (!_cartService.UserExists(userId))
+            {
+                return NotFound("User not found.");
+            }
+            _cartService.RemoveFromCart(userId, productId);
+            return Ok();
+        }
+
+        [HttpDelete("{userId}/clear")]
+        public ActionResult ClearCart(int userId)
+        {
+            if (!_cartService.UserExists(userId))
+            {
+                return NotFound("User not found.");
+            }
+            _cartService.ClearCart(userId);
+            return Ok();
+        }
+
+        [HttpPut("{userId}/update-quantity")]
+        public IActionResult UpdateQuantity(int userId, [FromBody] UpdateQuantityRequest request)
+        {
+            if (!_cartService.UserExists(userId))
+            {
+                return NotFound("User not found.");
+            }
+            _cartService.UpdateQuantity(userId, request.ProductId, request.NewQuantity);
+            return Ok();
         }
     }
 }
+

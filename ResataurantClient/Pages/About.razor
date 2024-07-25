@@ -1,0 +1,82 @@
+﻿@page "/about"
+@using ResataurantClient.Models
+@using ResataurantClient.Services
+@using RestaurantClient.Services
+@inject NavigationManager NavigationManager
+
+@code {
+    private void GoToMenu()
+    {
+        NavigationManager.NavigateTo("/menu");
+    }
+
+    private void GoToCart()
+    {
+        NavigationManager.NavigateTo("/cart");
+    }
+}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">Название вашего ресторана</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/menu">Меню</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/about">О нас</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <button class="btn btn-outline-success" @onclick="GoToCart">
+                        Корзина
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h2>О нас</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                Добро пожаловать в наш ресторан! Мы гордимся тем, что предлагаем нашим гостям широкий выбор блюд,
+                приготовленных из самых свежих ингредиентов. Наш ресторан был основан в [год основания] году и с тех пор
+                завоевал любовь и доверие множества посетителей.
+            </p>
+            <p>
+                Наша команда профессиональных поваров и обслуживающего персонала стремится создать для вас
+                незабываемые впечатления от каждого визита. Мы предлагаем как классические, так и авторские блюда,
+                чтобы удовлетворить вкусы самых требовательных гурманов.
+            </p>
+            <p>
+                Мы благодарим вас за выбор нашего ресторана и надеемся, что вы получите истинное удовольствие от
+                наших блюд и сервиса.
+            </p>
+            <button class="btn btn-primary mt-3" @onclick="GoToMenu">Посмотреть меню</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+    }
+
+    .navbar {
+        margin-bottom: 20px;
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
+</style>

@@ -4,10 +4,11 @@ namespace TestRestautantProductOnly.Service
 {
     public interface ICartService
     {
-        Cart GetCart();
-        void AddToCart(CartItem item);
-        void RemoveFromCart(int productId);
-        void ClearCart();
-        void UpdateQuantity(int productId, int newQuantity);
+        bool UserExists(int userId);
+        Cart GetCart(int userId);
+        void AddToCart(int userId,CartItem item);
+        void RemoveFromCart(int userId,int productId);
+        void ClearCart(int userId);
+        void UpdateQuantity(int userId, int productId, int newQuantity);
     }
 }

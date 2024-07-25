@@ -1,31 +1,64 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using TestRestautantProductOnly.Infractruct;
 using TestRestautantProductOnly.Model;
-using TestRestautantProductOnly.Repository;
+using TestRestautantProductOnly.Model.Orders;
 
 namespace TestRestautantProductOnly.Service
 {
     public class OrderService : IOrderService
     {
-        private readonly List<Order> _orders = new();
+        private readonly RestaurantContext _context;
 
-        public Task<int> CreateOrder(Order order)
+        public OrderService(RestaurantContext context)
         {
-            order.OrderId = _orders.Count + 1;
-            _orders.Add(order);
-            return Task.FromResult(order.OrderId);
+            _context = context;
         }
 
-        public Task<Order> GetOrder(int orderId)
+        public async Task<Order> CreateOrderAsync(int userId,OrderCreateDto orderCreateDto)
         {
-            var order = _orders.FirstOrDefault(o => o.OrderId == orderId);
-            return Task.FromResult(order);
+            var order = new Order
+            {
+                UserId = userId,
+                CustomerName = orderCreateDto.CustomerName,
+                CustomerEmail = orderCreateDto.CustomerEmail,
+                CustomerAddress = orderCreateDto.CustomerAddress
+            };
+
+            foreach (var item in orderCreateDto.OrderItems)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product != null)
+                {
+                    var orderItem = new OrderItem
+                    {
+                        ProductId = product.Id,
+                        Name = product.Name,
+                        Quantity = item.Quantity,
+                        Price = product.Price,
+                        ImageUrl = product.ImageUrl
+                    };
+                    order.OrderItems.Add(orderItem);
+                }
+            }
+
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+            return order;
         }
 
-        public Task<IEnumerable<Order>> GetOrders()
+        public async Task<Order> GetOrderByIdAsync(int userId, int id)
         {
-            return Task.FromResult<IEnumerable<Order>>(_orders);
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+            {
+                // Здесь можно добавить дополнительную обработку, например, логирование
+                return null;
+            }
+
+            return order;
         }
     }
 }

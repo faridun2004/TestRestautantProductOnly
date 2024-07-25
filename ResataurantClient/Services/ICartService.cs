@@ -4,10 +4,10 @@ namespace ResataurantClient.Services
 {
     public interface ICartService
     {
-        Task<Cart> GetCart();
-        Task AddToCart(CartItem item);
-        Task RemoveFromCart(int productId);
-        Task ClearCart();
-        Task UpdateQuantity(int productId, int newQuantity);
+        Task<Cart> GetCart(int userId);
+        Task AddToCart(int userId,CartItem item);
+        Task RemoveFromCart(int productId, int userId);
+        Task ClearCart(int userId);
+        Task UpdateQuantity(int userId,int productId, int newQuantity);
     }
 }

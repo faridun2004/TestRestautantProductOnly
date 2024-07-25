@@ -12,6 +12,9 @@ namespace TestRestautantProductOnly.Service
             service.AddSingleton<ICartService, CartService>();
             service.AddScoped<IOrderService, OrderService>();
             service.AddScoped<IOrderRepository, OrderRepository>();
+            service.AddScoped<IUserService, UserService>();
+            service.AddScoped<IUserRepository, UserRepository>();
+            service.AddScoped<IShipmentRepository, ShipmentRepository>();
         }
     }
 }
